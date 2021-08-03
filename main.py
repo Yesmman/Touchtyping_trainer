@@ -29,7 +29,7 @@ def second_window_form():
 
     def get():
         text_to_load = text_field.get("1.0", "end")
-        db.add_text(text_to_load)
+        db.add_text(db.Quotes, text_to_load)
 
     button = tk.Button(f1,
                        text="Load",
@@ -63,9 +63,9 @@ def thread_start():
 
 def get_text():
     t.destroy()
-    max_id = db.get_id()
+    max_id = db.get_id(db.Quotes)
     random_number = random.randint(1, max_id)
-    typing.string = db.get_text_by_id(random_number)
+    typing.string = db.get_text_by_id(random_number, db.Quotes)
 
 
 def labels_from_dict(dict_):
@@ -95,10 +95,11 @@ def typing_process(event):
     t.tag_config("Active", foreground="black")
     text_index = f"{typing.string_index}.{typing.char_index}"
     example = t.get(text_index)
-
+    full_text = t.get("1.0", f"{t['height'] - 1}.end")
     if word != "":
         if len(word) == len(t.get(f"{typing.string_index}.0", f"{typing.string_index}.{typing.char_index + 1}")):
             if word[typing.char_index] == example:
+                typing.text += example
                 typing.char_index += 1
                 t.tag_delete("Mistake")
                 t.tag_add("Done", text_index)
@@ -124,27 +125,31 @@ def typing_process(event):
             typing.char_index = 0
             input_text.delete("0", "end")
 
-        if word == t.get("1.0", "end"):
+        if word == full_text:
+            t.delete("1.0", "end")
             get_text()
             parser(typing.string)
             t.tag_delete("Done")
             input_text.delete(0, "end")
-            # typing.reset_values()
+            t.update()
+            window.update()
 
 
 def check():
     typing.time = 0
+    typing.text = ""
     x = window.bind("<Key>", typing_process)
     while True:
         time.sleep(1)
         typing.time += 1
         time_label["text"] = typing.time
         time_label.update()
-        if typing.time == 60:
+        if typing.time == 30:
             typing.do_stop()
         if typing.stop:
             window.unbind("<Key>", x)
             break
+    typing.string = typing.text
     generate_labels()
 
 
@@ -192,7 +197,6 @@ def parser(any_text):
             c2 = 0
         word += char
         l_.update()
-        print(l_.winfo_reqwidth(), l_.winfo_width(), t["width"], l_["width"], l_["text"])
 
         if char == " " or count == len(any_text):
             l_["text"] += word
@@ -209,6 +213,8 @@ def parser(any_text):
     l_.destroy()
     t["height"] = typing.string_index
     t["state"] = "disable"
+    typing.string_index = 1
+
     t.pack(side=tk.TOP)
 
 

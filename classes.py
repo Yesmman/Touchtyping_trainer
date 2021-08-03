@@ -6,6 +6,7 @@ class Typing:
     font = "Verdana 18"
     width = 60
     string = ""
+    text = ""
     char_index = 0
     string_index = 1
     background_color = "misty rose"
@@ -20,7 +21,6 @@ class Typing:
             self.start_typing = True
 
     def get_result(self):
-
         number_of_symbols = len(self.string)
         speed = number_of_symbols / self.time
         speed_per_minute = number_of_symbols * 60 / self.time

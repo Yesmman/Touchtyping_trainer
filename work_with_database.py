@@ -9,13 +9,22 @@ engine = create_engine('sqlite:///my.db', echo=False)
 Base = declarative_base()
 
 
-class User(Base):
+class Texts(Base):
     __tablename__ = 'Texts'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('text_id_seq'), primary_key=True)
     text = Column(String())
 
     def __repr__(self):
-        return "<User(text='%s')>" % self.text
+        return "<Texts(text='%s')>" % self.text
+
+
+class Quotes(Base):
+    __tablename__ = 'Quotes'
+    id = Column(Integer, Sequence('quotes_id_seq'), primary_key=True)
+    text = Column(String())
+
+    def __repr__(self):
+        return "<Quotes(text='%s')>" % self.text
 
 
 Session = sessionmaker(bind=engine)
@@ -25,29 +34,29 @@ session = Session()
 Base.metadata.create_all(engine)
 
 
-def add_text(text):
-    text_object = User(text=text)
+def add_text(cls, text):
+    text_object = cls(text=text)
     session.add(text_object)
     session.commit()
 
 
-def clear():
-    for instance in session.query(User):
+def clear(cls):
+    for instance in session.query(cls):
         session.delete(instance)
     session.commit()
 
 
-def add_text_form():
+def add_text_form(cls):
     text = input("Input your text to add it to database: ")
-    add_text(text)
+    add_text(text, cls)
 
 
-def get_text_by_id(id_):
-    return session.query(User).get(id_).text
+def get_text_by_id(id_, cls):
+    return session.query(cls).get(id_).text
 
 
-def get_id():
-    return session.query(User).count()
+def get_id(cls):
+    return session.query(cls).count()
 
 # clear()
 # print(get_id())
