@@ -1,3 +1,5 @@
+import work_with_database as db
+
 class Typing:
     number_of_mistakes = 0
     time = 0
@@ -11,6 +13,7 @@ class Typing:
     string_index = 1
     background_color = "misty rose"
     buttons_color = "misty rose"
+    current_db = db.Texts
     # number_of_symbols = 0
 
     mode = "Training"

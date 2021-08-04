@@ -4,6 +4,7 @@ import work_with_database as db
 import random
 from classes import Typing
 import time
+from functools import partial
 
 typing = Typing()
 window = tk.Tk()
@@ -13,6 +14,34 @@ label_width = 450
 list_of_label = []
 
 q = []
+
+
+def change_mode(mode):
+    dict_ = {
+        "Texts": db.Texts,
+        "Quotes": db.Quotes,
+    }
+    typing.current_db = dict_[mode]
+
+
+def create_menu():
+    main_menu = tk.Menu(window, tearoff=0, font=typing.font)
+    window.config(menu=main_menu)
+
+    file_menu = tk.Menu(main_menu, tearoff=0, font=typing.font)
+    change_menu = tk.Menu(file_menu, tearoff=0, font=typing.font)
+    change_menu.add_command(label="Quotes", command=partial(change_mode, "Quotes"), font=typing.font)
+    change_menu.add_command(label="Texts", command=partial(change_mode, "Texts"), font=typing.font)
+
+    file_menu.add_cascade(label="Change mode", menu=change_menu)
+
+    # file_menu.add_command(label="Change mode", font=typing.font)
+    file_menu.add_command(label="Exit", command=lambda: exit(), font=typing.font)
+    # main_menu.add_command(label="File", command=partial(main_menu.add_cascade, menu=file_menu), font=typing.font)
+    main_menu.add_cascade(label="File", menu=file_menu, font=typing.font)
+
+
+create_menu()
 
 
 def second_window_form():
@@ -63,9 +92,10 @@ def thread_start():
 
 def get_text():
     t.destroy()
-    max_id = db.get_id(db.Quotes)
+    max_id = db.get_id(typing.current_db)
+
     random_number = random.randint(1, max_id)
-    typing.string = db.get_text_by_id(random_number, db.Quotes)
+    typing.string = db.get_text_by_id(random_number, typing.current_db)
 
 
 def labels_from_dict(dict_):
