@@ -25,20 +25,24 @@ def change_mode(mode):
 
 
 def create_menu():
-    main_menu = tk.Menu(window, tearoff=0, font=typing.font)
-    window.config(menu=main_menu)
-
-    file_menu = tk.Menu(main_menu, tearoff=0, font=typing.font)
+    menu_button = tk.Menubutton(window,
+                                text="File",
+                                font=typing.font,
+                                bg=typing.background_color,
+                                relief=tk.RAISED,
+                                activebackground="skyblue")
+    menu_button.pack()
+    file_menu = tk.Menu(menu_button, tearoff=0)
+    menu_button["menu"] = file_menu
     change_menu = tk.Menu(file_menu, tearoff=0, font=typing.font)
     change_menu.add_command(label="Quotes", command=partial(change_mode, "Quotes"), font=typing.font)
+
     change_menu.add_command(label="Texts", command=partial(change_mode, "Texts"), font=typing.font)
 
-    file_menu.add_cascade(label="Change mode", menu=change_menu)
+    file_menu.add_cascade(label="Change mode", menu=change_menu, font=typing.font)
 
-    # file_menu.add_command(label="Change mode", font=typing.font)
     file_menu.add_command(label="Exit", command=lambda: exit(), font=typing.font)
-    # main_menu.add_command(label="File", command=partial(main_menu.add_cascade, menu=file_menu), font=typing.font)
-    main_menu.add_cascade(label="File", menu=file_menu, font=typing.font)
+    # main_menu.add_cascade(label="File", menu=file_menu, font=typing.font)
 
 
 create_menu()
