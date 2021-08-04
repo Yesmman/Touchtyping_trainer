@@ -27,6 +27,15 @@ class Quotes(Base):
         return "<Quotes(text='%s')>" % self.text
 
 
+class Levels(Base):
+    __tablename__ = 'Levels'
+    id = Column(Integer, Sequence('levels_id_seq'), primary_key=True)
+    text = Column(String())
+
+    def __repr__(self):
+        return "<Levels(text='%s')>" % self.text
+
+
 Session = sessionmaker(bind=engine)
 Session.configure(bind=engine)
 session = Session()
@@ -48,7 +57,7 @@ def clear(cls):
 
 def add_text_form(cls):
     text = input("Input your text to add it to database: ")
-    add_text(text, cls)
+    add_text(cls, text)
 
 
 def get_text_by_id(id_, cls):
@@ -57,6 +66,9 @@ def get_text_by_id(id_, cls):
 
 def get_id(cls):
     return session.query(cls).count()
+
+
+# add_text_form(Levels)
 
 # clear()
 # print(get_id())

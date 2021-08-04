@@ -5,6 +5,7 @@ import random
 from classes import Typing
 import time
 from functools import partial
+import study_mode
 
 typing = Typing()
 window = tk.Tk()
@@ -20,6 +21,7 @@ def change_mode(mode):
     dict_ = {
         "Texts": db.Texts,
         "Quotes": db.Quotes,
+        "Levels": db.Levels
     }
     typing.current_db = dict_[mode]
 
@@ -35,6 +37,8 @@ def create_menu():
     file_menu = tk.Menu(menu_button, tearoff=0)
     menu_button["menu"] = file_menu
     change_menu = tk.Menu(file_menu, tearoff=0, font=typing.font)
+    change_menu.add_command(label="Levels", command=partial(change_mode, "Levels"), font=typing.font)
+
     change_menu.add_command(label="Quotes", command=partial(change_mode, "Quotes"), font=typing.font)
 
     change_menu.add_command(label="Texts", command=partial(change_mode, "Texts"), font=typing.font)
@@ -42,7 +46,6 @@ def create_menu():
     file_menu.add_cascade(label="Change mode", menu=change_menu, font=typing.font)
 
     file_menu.add_command(label="Exit", command=lambda: exit(), font=typing.font)
-    # main_menu.add_cascade(label="File", menu=file_menu, font=typing.font)
 
 
 create_menu()
@@ -84,6 +87,9 @@ def second_window_form():
 
 def thread_start():
     get_text()
+    if typing.current_db == db.Levels:
+        typing.string = study_mode.get_random_string(typing.string)
+
     parser(typing.string)
 
     typing.reset_values()
@@ -137,7 +143,7 @@ def typing_process(event):
                 typing.char_index += 1
                 t.tag_delete("Mistake")
                 t.tag_add("Done", text_index)
-                t.tag_config("Done", background="PaleGreen1")
+                t.tag_config("Done", background="SkyBlue1")
             else:
                 t.tag_add("Mistake", text_index)
                 t.tag_config("Mistake", background="red")
@@ -160,29 +166,38 @@ def typing_process(event):
             input_text.delete("0", "end")
 
         if word == full_text:
-            t.delete("1.0", "end")
-            get_text()
-            parser(typing.string)
-            t.tag_delete("Done")
-            input_text.delete(0, "end")
-            t.update()
-            window.update()
+            if typing.current_db == "Levels":
+                typing.do_stop()
+            else:
+                t.delete("1.0", "end")
+                get_text()
+                parser(typing.string)
+                t.tag_delete("Done")
+                input_text.delete(0, "end")
+                t.update()
+                window.update()
 
 
 def check():
     typing.time = 0
     typing.text = ""
     x = window.bind("<Key>", typing_process)
-    while True:
-        time.sleep(1)
-        typing.time += 1
-        time_label["text"] = typing.time
-        time_label.update()
-        if typing.time == 30:
-            typing.do_stop()
-        if typing.stop:
-            window.unbind("<Key>", x)
-            break
+    if typing.current_db == db.Levels:
+        while True:
+            if typing.stop:
+                window.unbind("<Key>", x)
+                break
+    else:
+        while True:
+            time.sleep(1)
+            typing.time += 1
+            time_label["text"] = typing.time
+            time_label.update()
+            if typing.time == 60:
+                typing.do_stop()
+            if typing.stop:
+                window.unbind("<Key>", x)
+                break
     typing.string = typing.text
     generate_labels()
 
